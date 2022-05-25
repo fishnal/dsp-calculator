@@ -26,14 +26,25 @@ function luaEval(ast: LuaAst, parentTable?: any | undefined): any {
 		return parentTable;
 	} else if (ast.type === 'TableConstructorExpression') {
 		let table: any = {};
+		let tableIsArrayLike = true;
 		let index = 0;
 		ast.fields.forEach(function (field) {
 			if (field.type === 'TableValue') {
 				table[index++] = luaEval(field, table);
 			} else {
+				tableIsArrayLike = false;
 				luaEval(field, table);
 			}
-		})
+		});
+
+		if (tableIsArrayLike) {
+			let arr = [];
+			for (let k in table) {
+				arr[Number.parseInt(k)] = table[k];
+			}
+			return arr;
+		}
+
 		return table;
 	} else if (ast.type === 'TableKey') {
 		assert(parentTable, "Can't have a table key without a table to put it in");
@@ -45,7 +56,7 @@ function luaEval(ast: LuaAst, parentTable?: any | undefined): any {
 		return parentTable;
 	} else if (ast.type === 'TableValue') {
 		return luaEval(ast.value);
-	} else if (astIsLiteralExpression(ast)) {
+	} else if (astIsLiteralPrimitiveExpression(ast)) {
 		if (ast.type === 'StringLiteral') {
 			return (ast as WeirdStringLiteral).value ?? parseRawLuaString(ast.raw);
 		}
@@ -58,10 +69,10 @@ function luaEval(ast: LuaAst, parentTable?: any | undefined): any {
 		return -1 * luaEval(ast.argument);
 	}
 
-	throw new SyntaxError('Unknown AST: ' + JSON.stringify(ast));
+	console.log('Ignored ' + JSON.stringify(ast));
 }
 
-function astIsLiteralExpression(x: any): x is LuaAstLiteralPrimitiveExpression {
+function astIsLiteralPrimitiveExpression(x: any): x is LuaAstLiteralPrimitiveExpression {
 	return x != null && typeof x['type'] === 'string' && x['type'].indexOf('Literal') >= 0;
 }
 
