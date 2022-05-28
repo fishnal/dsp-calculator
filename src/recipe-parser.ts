@@ -1,8 +1,8 @@
 import luaToJson from "./lib/@iarna/lua-to-json";
 import fs from 'fs/promises';
-import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from './lib/@iarna/lua-to-json/schema/game-ts-schema';
+import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from './schema/game-ts-schema';
 import chunk from "lodash/chunk";
-import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap, LuaGameItem, LuaGameFacility, LuaGameRecipe } from './lib/@iarna/lua-to-json/schema/game-lua-schema';
+import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap, LuaGameItem, LuaGameFacility, LuaGameRecipe } from './schema/game-lua-schema';
 
 async function parseDSPLuaGameData(filename: string): Promise<GameData> {
 	let buf = await fs.readFile(filename);
