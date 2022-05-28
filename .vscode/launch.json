@@ -14,6 +14,19 @@
 			"runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal"
-		}
+		},
+		{
+			"type": "node",
+			"name": "vscode-jest-tests",
+			"request": "launch",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"cwd": "${workspaceFolder}",
+			"runtimeArgs": [
+				"${workspaceFolder}/node_modules/jest/bin/jest.js",
+				"--runInBand"
+			],
+			"sourceMaps": true,
+		  }
 	]
 }
