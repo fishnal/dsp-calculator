@@ -4,6 +4,10 @@ import { Recipe, Item, ItemWithRate } from './lib/@iarna/lua-to-json/schema/game
 export default class RecipeList {
 	private readonly _recipes: Recipe[] = [];
 
+	constructor(recipes: Recipe[]) {
+		this._recipes.push(...recipes);
+	}
+
 	add(recipe: Recipe): void {
 		this._recipes.push(recipe);
 	}
