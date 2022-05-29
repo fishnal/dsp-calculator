@@ -1,6 +1,6 @@
 import { Recipe } from '../../src/schema/game-ts-schema';
 import path from 'path';
-import gameDataParser from '../../src/game-data-parser';
+import gameDataParser from '../../src/game-data/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
 

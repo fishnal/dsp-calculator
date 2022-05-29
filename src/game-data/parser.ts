@@ -1,8 +1,8 @@
-import { luaToJson } from "./lib/@iarna/lua-to-json";
+import { luaToJson } from "../lib/@iarna/lua-to-json";
 import fs from 'fs/promises';
-import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from './schema/game-ts-schema';
+import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from '../schema/game-ts-schema';
 import chunk from "lodash/chunk";
-import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameFacility, LuaGameRecipe } from './schema/game-lua-schema';
+import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameFacility, LuaGameRecipe } from '../schema/game-lua-schema';
 
 function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities: Record<string, LuaGameFacility>): ProductionType {
 	let result = Object.entries(gameFacilities).find(([_, gameFacility]) =>
