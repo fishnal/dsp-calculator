@@ -1,82 +1,35 @@
 // https://github.com/iarna/lua-to-json
 
 import assert from "assert";
+import { readFile } from "fs/promises";
 import luaParser from 'luaparse';
+import path from 'path';
 
-export default function luaToJson<T = any>(lua: string): T {
-	return luaEval(luaParser.parse(lua));
+type LuaVariables = Record<any, string | number | boolean | object | any[] | null | undefined>;
+
+export function luaToJson(contents: string): LuaVariables {
+	return parseAst(luaParser.parse(contents), '<memory>');
 }
 
-function luaEval(ast: LuaAst, parentTable?: any | undefined): any {
-	if (ast.type === 'Chunk') {
-		let table = {};
-		ast.body.forEach(function (statement) {
-			luaEval(statement, table);
-		});
-		return table;
-	} else if (ast.type === 'AssignmentStatement') {
-		assert(parentTable, "Can't have an assignment statement without a place to put it");
-		for (let i = 0; i < ast.variables.length; ++i) {
-			let varInfo = ast.variables[i];
-			if (varInfo.type !== 'Identifier') {
-				throw new SyntaxError('Unknown variable type: ' + JSON.stringify(ast));
-			}
-			parentTable[varInfo.name] = luaEval(ast.init[i]);
-		}
-		return parentTable;
-	} else if (ast.type === 'TableConstructorExpression') {
-		let table: any = {};
-		let tableIsArrayLike = true;
-		let index = 0;
-		ast.fields.forEach(function (field) {
-			if (field.type === 'TableValue') {
-				table[index++] = luaEval(field, table);
-			} else {
-				tableIsArrayLike = false;
-				luaEval(field, table);
-			}
-		});
+export async function luaFileToJson(filepath: string): Promise<LuaVariables> {
+	filepath = path.resolve(filepath);
+	let contents = (await readFile(filepath)).toString();
+	return parseAst(luaParser.parse(contents), filepath);
+}
 
-		if (tableIsArrayLike) {
-			let arr = [];
-			for (let k in table) {
-				arr[Number.parseInt(k)] = table[k];
-			}
-			return arr;
-		}
-
-		return table;
-	} else if (ast.type === 'TableKey') {
-		assert(parentTable, "Can't have a table key without a table to put it in");
-		parentTable[luaEval(ast.key)] = luaEval(ast.value);
-		return parentTable;
-	} else if (ast.type === 'TableKeyString') {
-		assert(parentTable, "Can't have a table key without a table to put it in");
-		parentTable[ast.key.name] = luaEval(ast.value);
-		return parentTable;
-	} else if (ast.type === 'TableValue') {
-		return luaEval(ast.value);
-	} else if (astIsLiteralPrimitiveExpression(ast)) {
-		if (ast.type === 'StringLiteral') {
-			return (ast as WeirdStringLiteral).value ?? parseRawLuaString(ast.raw);
-		}
-		return ast.value;
-	} else if (ast.type === 'UnaryExpression') {
-		if (ast.operator !== '-') {
-			throw new SyntaxError('Unsupported unary operator: ' + JSON.stringify(ast));
-		}
-
-		return -1 * luaEval(ast.argument);
+function getFilepathWithCursorPos(filepath: string, ast: LuaAst) {
+	let s = filepath;
+	if (ast.loc != null) {
+		s += `:${ast.loc.start.line}:${ast.loc.start.column}`
 	}
-
-	console.log('Ignored ' + JSON.stringify(ast));
+	return s;
 }
 
-function astIsLiteralPrimitiveExpression(x: any): x is LuaAstLiteralPrimitiveExpression {
+function isAstPrimitiveLiteral(x: any): x is LuaAstLiteralPrimitiveExpression {
 	return x != null && typeof x['type'] === 'string' && x['type'].indexOf('Literal') >= 0;
 }
 
-function parseRawLuaString(x: string) {
+function parseRawLuaString(x: string): string {
 	if (x.startsWith("\'") || x.startsWith("\"")) {
 		x = x.substring(1);
 	}
@@ -86,6 +39,112 @@ function parseRawLuaString(x: string) {
 	}
 
 	return x;
+}
+
+function parseAst(ast: LuaAst, filepath: string) {
+	if (ast.type === 'Chunk') {
+		return parseChunk(ast, filepath);
+	}
+
+	let msg = `Expected a chunk, but got ${ast.type} instead`;
+	msg += ` at ${getFilepathWithCursorPos(filepath, ast)}`
+	throw new SyntaxError(msg);
+}
+
+function parseChunk(ast: luaParser.Chunk, filepath: string): LuaVariables {
+	let table = {};
+	ast.body.forEach(stmt => parseStatement(stmt, table, filepath));
+	return table;
+}
+
+function parseStatement(
+	ast: luaParser.Statement,
+	scope: Record<any, number | string | boolean | object | any[] | null | undefined>,
+	filepath: string
+): void {
+	if (ast.type !== 'AssignmentStatement') {
+		console.debug(`Ignoring ${ast.type} at ${getFilepathWithCursorPos(filepath, ast)}`);
+		return;
+	}
+
+	ast.variables.forEach((variable, i) => {
+		if (variable.type !== 'Identifier') {
+			console.debug(`Ignoring ${variable.type} at ${getFilepathWithCursorPos(filepath, ast)}`);
+			return;
+		}
+
+		let assignedExpression = ast.init[i];
+		scope[variable.name] = parseExpression(assignedExpression, filepath);
+	});
+}
+
+function parseExpression(ast: luaParser.Expression, filepath: string): object | number | string | boolean | null {
+	if (ast.type === 'UnaryExpression') {
+		if (ast.operator === '#') {
+			let value = parseExpression(ast.argument, filepath);
+			if (typeof value !== 'string') {
+				let msg = `Invalid size argument at ${getFilepathWithCursorPos(filepath, ast)}`;
+				msg += `\nExpected a string, but got ${typeof value} instead`;
+				throw new SyntaxError(msg);
+			}
+
+			return value.length;
+		} else if (ast.operator === '-') {
+			let value = parseExpression(ast.argument, filepath);
+			if (typeof value !== 'number') {
+				let msg = `Expected number but got ${typeof value}`;
+				msg += ` at ${getFilepathWithCursorPos(filepath, ast)}`;
+				throw new SyntaxError(msg);
+			}
+
+			return -1 * value;
+		}
+	} else if (isAstPrimitiveLiteral(ast)) {
+		if (ast.type === 'StringLiteral') {
+			return parseRawLuaString(ast.raw);
+		} else {
+			return ast.value;
+		}
+	} else if (ast.type === 'TableConstructorExpression') {
+		return parseTable(ast, filepath);
+	}
+
+	let msg = `Unexpected ${ast.type} at ${getFilepathWithCursorPos(filepath, ast)}`;
+		throw new SyntaxError(msg);
+}
+
+function parseTable(ast: luaParser.TableConstructorExpression, filepath: string): object {
+	let table: Record<any, any> = {};
+	let tableIsArrayLike = true;
+	let index = 0;
+	ast.fields.forEach(field => {
+		if (field.type === 'TableValue') {
+			table[index++] = parseExpression(field.value, filepath);
+		} else if (field.type === 'TableKeyString') {
+			tableIsArrayLike = false;
+			table[field.key.name] = parseExpression(field.value, filepath);
+		} else {
+			tableIsArrayLike = false;
+			let keyName = parseExpression(field.key, filepath);
+			if (typeof keyName !== 'number' || typeof keyName !== 'string') {
+				let msg = `Invalid key type "${typeof keyName}"`;
+				msg += ` at ${getFilepathWithCursorPos(filepath, ast)}`;
+				throw new SyntaxError(msg);
+			}
+			let value = parseExpression(field.value, filepath);
+			table[keyName] = value;
+		}
+	});
+
+	if (tableIsArrayLike) {
+		let arr = [];
+		for (let k in table) {
+			arr[Number.parseInt(k)] = table[k];
+		}
+		return arr;
+	}
+
+	return table;
 }
 
 type LuaAst = luaParser.Chunk
@@ -99,7 +158,3 @@ type LuaAstLiteralPrimitiveExpression = luaParser.StringLiteral
 	| luaParser.NumericLiteral
 	| luaParser.BooleanLiteral
 	| luaParser.NilLiteral;
-
-type WeirdStringLiteral = luaParser.StringLiteral & {
-	value?: string;
-}

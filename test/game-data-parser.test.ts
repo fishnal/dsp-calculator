@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import luaToJson from '../src/lib/@iarna/lua-to-json';
+import { luaToJson } from '../src/lib/@iarna/lua-to-json';
 import gameDataParser from '../src/game-data-parser';
 import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
 import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../src/schema/game-ts-schema';

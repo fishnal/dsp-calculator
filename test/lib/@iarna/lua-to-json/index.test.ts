@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import path from "path";
 
-import luaToJson from '../../../../src/lib/@iarna/lua-to-json';
+import { luaToJson } from '../../../../src/lib/@iarna/lua-to-json';
 
 test('parses simple values', () => {
 	let luaStr = readFileSync(path.join(__dirname, 'simple.lua')).toString();

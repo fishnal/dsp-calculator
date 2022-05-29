@@ -1,8 +1,8 @@
-import luaToJson from "./lib/@iarna/lua-to-json";
+import { luaToJson } from "./lib/@iarna/lua-to-json";
 import fs from 'fs/promises';
 import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from './schema/game-ts-schema';
 import chunk from "lodash/chunk";
-import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap, LuaGameItem, LuaGameFacility, LuaGameRecipe } from './schema/game-lua-schema';
+import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameFacility, LuaGameRecipe } from './schema/game-lua-schema';
 
 function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities: Record<string, LuaGameFacility>): ProductionType {
 	let result = Object.entries(gameFacilities).find(([_, gameFacility]) =>
@@ -21,13 +21,21 @@ function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities:
 const def = {
 	async parseDSPLuaGameData(filename: string): Promise<GameData> {
 		let buf = await fs.readFile(filename);
-		let luaVariables: { gameData: LuaGameData } = luaToJson(buf.toString());
+		let luaVariables = luaToJson(buf.toString());
+		if (luaVariables.gameData == null) {
+			throw new Error('did not find variable "gameData"');
+		} else if (typeof luaVariables.gameData !== 'object') {
+			throw new TypeError(`expected "gameData" to be dictionary, but instead is ${typeof luaVariables.gameData}`);
+		} else if (luaVariables.gameData instanceof Array) {
+			throw new TypeError(`expected "gameData" to be dictionary, but instead is array`);
+		}
+
 		let {
 			game_items: luaGameItems,
 			game_facilities: luaGameFacilities,
 			game_recipes: luaGameRecipes,
 			starting_recipes: luaStartingRecipes
-		} = luaVariables.gameData;
+		} = luaVariables.gameData as any;
 
 		let { items, itemIdMap } = this.parseLuaGameItemMap(luaGameItems, luaGameFacilities);
 		let { recipes, recipeIdMap } = this.parseLuaGameRecipes(luaGameRecipes, itemIdMap);
