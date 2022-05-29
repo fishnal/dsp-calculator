@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises';
 import luaToJson from '../src/lib/@iarna/lua-to-json';
-import { parseDSPLuaGameData, mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap } from '../src/recipe-parser';
-import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap } from '../src/schema/game-lua-schema';
-import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem } from '../src/schema/game-ts-schema';
+import { parseDSPLuaGameData, mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap, parseLuaGameRecipes } from '../src/recipe-parser';
+import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
+import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../src/schema/game-ts-schema';
 
 jest.mock('fs/promises');
 jest.mock('../src/lib/@iarna/lua-to-json');
@@ -159,7 +159,86 @@ describe('parseLuaGameItemMap', () => {
 });
 
 describe('parseLuaGameRecipes', () => {
-	test.todo('not written');
+	test('empty parameters returns empty recipe list and empty id mapping', () => {
+		let { recipes, recipeIdMap } = parseLuaGameRecipes([], new Map());
+
+		expect(recipes).toHaveLength(0);
+		expect(Object.keys(recipeIdMap)).toHaveLength(0);
+	});
+
+	test('fails on invalid production type', () => {
+		let gameRecipes: LuaGameRecipe[] = [
+			{ id: 0, type: 'FAKE', inputs: [], outputs: [], seconds: -1 }
+		];
+
+		mocks.isProductionType.mockReturnValue(false);
+
+		expect(() => parseLuaGameRecipes(gameRecipes, new Map()))
+			.toThrowError(/invalid production type "FAKE" for recipe id 0/i)
+	});
+
+	test.each(['NONE'])
+	('fails on invalid production type \"%p\"', (productionType) => {
+		let gameRecipes: LuaGameRecipe[] = [
+			{ id: 0, type: productionType, inputs: [], outputs: [], seconds: -1 }
+		];
+
+		mocks.isProductionType.mockReturnValue(true);
+
+		expect(() => parseLuaGameRecipes(gameRecipes, new Map()))
+			.toThrowError(/unexpected recipe production type "NONE"/i);
+	});
+
+	test('fails when it cannot find a facility that produces an item because there\'s no facility production items in the map', () => {
+		let gameRecipes: LuaGameRecipe[] = [
+			{ id: 0, type: 'FOOBAR', inputs: [], outputs: [], seconds: -1 }
+		];
+
+		mocks.isProductionType.mockReturnValue(true);
+		mocks.isFacilityProductionItem.mockReturnValue(false);
+
+		expect(() => parseLuaGameRecipes(gameRecipes, new Map()))
+			.toThrowError(/could not find a facility that recipe id 0 is produced in/i);
+	});
+
+	test('fails when it cannot find a facility that produces an item because there are no matching facilities', () => {
+		let gameRecipes: LuaGameRecipe[] = [
+			{ id: 0, type: 'SMELT', inputs: [], outputs: [], seconds: -1 }
+		];
+		let itemIdMap: Map<string, ProductionItem> = new Map();
+		itemIdMap.set('0', { name: 'foo', type: 'PRODUCTION', productionType: 'ASSEMBLE', productionSpeed: -1 });
+
+		mocks.isProductionType.mockReturnValue(true);
+		mocks.isFacilityProductionItem.mockReturnValue(true);
+
+		expect(() => parseLuaGameRecipes(gameRecipes, itemIdMap))
+			.toThrowError(/could not find a facility that recipe id 0 is produced in/i);
+	});
+
+	test('success path', () => {
+		let gameRecipes: LuaGameRecipe[] = [
+			{ id: 0, type: 'SMELT', inputs: [], outputs: [], seconds: -1 }
+		];
+		let itemIdMap: Map<string, Item> = new Map();
+		let myFacilityItem: ProductionItem = { name: 'foo', type: 'PRODUCTION', productionType: 'SMELT', productionSpeed: -1 };
+		itemIdMap.set('0', myFacilityItem);
+
+		let expectedRecipe: Recipe = {
+			producedIn: myFacilityItem,
+			inputs: [],
+			outputs: [],
+			productionTimeInSeconds: -1
+		}
+
+		mocks.isProductionType.mockReturnValue(true);
+		mocks.isFacilityProductionItem.mockReturnValue(true);
+
+		let { recipes, recipeIdMap } = parseLuaGameRecipes(gameRecipes, itemIdMap);
+
+		expect(recipes).toHaveLength(1);
+		expect(recipes[0]).toEqual(expectedRecipe);
+		expect(recipeIdMap.get(0)).toEqual(expectedRecipe);
+	});
 });
 
 describe('parse lua game data', () => {

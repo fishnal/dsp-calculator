@@ -89,7 +89,10 @@ function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities:
 	return productionType;
 }
 
-export function parseLuaGameRecipes(gameRecipes: LuaGameRecipe[], itemIdMap: Map<keyof LuaGameItemMap, Item>) {
+export function parseLuaGameRecipes(gameRecipes: LuaGameRecipe[], itemIdMap: Map<keyof LuaGameItemMap, Item>): {
+	recipes: Recipe[];
+	recipeIdMap: Map<number, Recipe>;
+} {
 	let recipes = gameRecipes.map(luaGameRecipe => {
 		let inputs = mapLuaRecipeItemsToItemsWithFrequency(luaGameRecipe.inputs, itemIdMap);
 		let outputs = mapLuaRecipeItemsToItemsWithFrequency(luaGameRecipe.outputs, itemIdMap);
