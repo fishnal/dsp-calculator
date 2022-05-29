@@ -1,12 +1,13 @@
 import { readFileSync } from "fs";
 import path from "path";
 
-import { luaFileToJson, luaToJson } from '../../../../src/lib/@iarna/lua-to-json';
+import { luaToJson } from '../../../../src/lib/@iarna/lua-to-json';
 
 test('parses simple values', () => {
 	let luaStr = readFileSync(path.join(__dirname, 'simple.lua')).toString();
 
-	let x = luaToJson(luaStr);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let x = luaToJson(luaStr) as any;
 
 	expect(x).toBeDefined();
 	expect(x.my_int).toBe(1);
@@ -24,7 +25,8 @@ test('parses simple values', () => {
 test('parses nested table', () => {
 	let luaStr = readFileSync(path.join(__dirname, 'table.lua')).toString();
 
-	let x = luaToJson(luaStr);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let x = luaToJson(luaStr) as any;
 
 	expect(x).toBeDefined();
 	expect(x.my_dict).toEqual({
@@ -59,7 +61,8 @@ test('parses nested table', () => {
 test('parses tables as compound type', () => {
 	let luaStr = readFileSync(path.join(__dirname, 'compound_table.lua')).toString();
 
-	let x = luaToJson(luaStr);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let x = luaToJson(luaStr) as any;
 
 	expect(x).toBeDefined();
 	expect(x.my_table).toEqual({
@@ -74,7 +77,8 @@ test('parses tables as compound type', () => {
 test('parses array with tables', () => {
 	let luaStr = readFileSync(path.join(__dirname, 'array_with_tables.lua')).toString();
 
-	let x = luaToJson(luaStr);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let x = luaToJson(luaStr) as any;
 
 	expect(x).toBeDefined();
 	expect(x.my_arr).toEqual([
@@ -93,8 +97,7 @@ test('parses array with tables', () => {
 test.each([
 	'x = 2+3',
 	'x = "a"+"b"'
-])
-('fails on binary expressions', luaStr => {
+])('fails on binary expressions', luaStr => {
 	expect(() => luaToJson(luaStr))
 		.toThrowError(/unexpected BinaryExpression/i)
 });

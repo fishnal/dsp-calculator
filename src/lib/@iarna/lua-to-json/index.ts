@@ -1,17 +1,14 @@
 // https://github.com/iarna/lua-to-json
 
-import assert from "assert";
 import { readFile } from "fs/promises";
 import luaParser from 'luaparse';
 import path from 'path';
 
-type LuaVariables = Record<any, string | number | boolean | object | any[] | null | undefined>;
-
-export function luaToJson(contents: string): LuaVariables {
+export function luaToJson(contents: string): unknown {
 	return parseAst(luaParser.parse(contents), '<memory>');
 }
 
-export async function luaFileToJson(filepath: string): Promise<LuaVariables> {
+export async function luaFileToJson(filepath: string): Promise<unknown> {
 	filepath = path.resolve(filepath);
 	let contents = (await readFile(filepath)).toString();
 	return parseAst(luaParser.parse(contents), filepath);
@@ -25,16 +22,17 @@ function getFilepathWithCursorPos(filepath: string, ast: LuaAst) {
 	return s;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isAstPrimitiveLiteral(x: any): x is LuaAstLiteralPrimitiveExpression {
 	return x != null && typeof x['type'] === 'string' && x['type'].indexOf('Literal') >= 0;
 }
 
 function parseRawLuaString(x: string): string {
-	if (x.startsWith("\'") || x.startsWith("\"")) {
+	if (x.startsWith("'") || x.startsWith("\"")) {
 		x = x.substring(1);
 	}
 
-	if (x.endsWith("\'") || x.endsWith("\"")) {
+	if (x.endsWith("'") || x.endsWith("\"")) {
 		x = x.substring(0, x.length - 1);
 	}
 
@@ -51,7 +49,7 @@ function parseAst(ast: LuaAst, filepath: string) {
 	throw new SyntaxError(msg);
 }
 
-function parseChunk(ast: luaParser.Chunk, filepath: string): LuaVariables {
+function parseChunk(ast: luaParser.Chunk, filepath: string) {
 	let table = {};
 	ast.body.forEach(stmt => parseStatement(stmt, table, filepath));
 	return table;
@@ -59,7 +57,7 @@ function parseChunk(ast: luaParser.Chunk, filepath: string): LuaVariables {
 
 function parseStatement(
 	ast: luaParser.Statement,
-	scope: Record<any, number | string | boolean | object | any[] | null | undefined>,
+	scope: Record<string | number, number | string | boolean | object | unknown[] | null | undefined>,
 	filepath: string
 ): void {
 	if (ast.type !== 'AssignmentStatement') {
@@ -114,7 +112,7 @@ function parseExpression(ast: luaParser.Expression, filepath: string): object | 
 }
 
 function parseTable(ast: luaParser.TableConstructorExpression, filepath: string): object {
-	let table: Record<any, any> = {};
+	let table: Record<string | number, string | number | boolean | object | null> = {};
 	let tableIsArrayLike = true;
 	let index = 0;
 	ast.fields.forEach(field => {

@@ -1,5 +1,3 @@
-import { isEqual } from "lodash";
-
 export type ItemType = 'RESOURCE' | 'MATERIAL' | 'COMPONENT' | 'PRODUCT'
 	| 'LOGISTICS' | 'PRODUCTION' | 'MATRIX';
 
@@ -49,6 +47,7 @@ export type ItemWithRate = {
 	readonly perMinute: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isItemType(x: any): x is ItemType {
 	if (x == null || typeof x !== 'string') return false;
 
@@ -66,6 +65,7 @@ export function isItemType(x: any): x is ItemType {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isProductionType(x: any): x is ProductionType {
 	if (x == null || typeof x !== 'string') {
 		return false;
@@ -88,6 +88,7 @@ export function isProductionType(x: any): x is ProductionType {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isFacilityProductionItem(x: any): x is FacilityProductionItem {
 	if (x == null || typeof x !== 'object') {
 		return false;

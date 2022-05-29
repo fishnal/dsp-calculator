@@ -188,8 +188,9 @@ describe('parseLuaGameRecipes', () => {
 			.toThrowError(/invalid production type "FAKE" for recipe id 0/i)
 	});
 
-	test.each(['NONE'])
-	('fails on invalid production type \"%p\"', (productionType) => {
+	test.each([
+		'NONE'
+	])('fails on invalid production type "%p"', (productionType) => {
 		let gameRecipes: LuaGameRecipe[] = [
 			{ id: 0, type: productionType, inputs: [], outputs: [], seconds: -1 }
 		];
@@ -265,17 +266,29 @@ describe('parseStartingRecipes', () => {
 	test('success path', () => {
 		let startingRecipeIds = [ 0, 1, 2 ];
 		let recipeIdMap: Map<number, Recipe> = new Map();
-		startingRecipeIds.forEach(id => recipeIdMap.set(id, { id } as any));
+		let stubRecipes = makeStubRecipes(3);
+		startingRecipeIds.forEach(i => recipeIdMap.set(i, stubRecipes[i]));
 
 		let startingRecipes = gameDataParser.parseStartingRecipes(startingRecipeIds, recipeIdMap);
 		expect(startingRecipes).toHaveLength(3);
 		expect(startingRecipes).toEqual([
-			{ id: 0 },
-			{ id: 1 },
-			{ id: 2 }
+			stubRecipes[0],
+			stubRecipes[1],
+			stubRecipes[2],
 		]);
 	});
 });
+
+function makeStubRecipes(count: number): Recipe[] {
+	let recipes: Recipe[] = [];
+	if (count < 0) throw new Error('negative count');
+
+	for (let i = 0; i < count; i++) {
+		recipes.push(Symbol(i) as unknown as Recipe);
+	}
+
+	return recipes;
+}
 
 describe('parseDSPLuaGameData', () => {
 	test('success path', async () => {

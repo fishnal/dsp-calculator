@@ -45,12 +45,12 @@ test('small game data file', async () => {
 	assertArrayEquals(startingRecipes, x.startingRecipes);
 });
 
-function assertArrayEquals(expected: readonly any[], actual: readonly any[]) {
+function assertArrayEquals<T>(expected: readonly T[], actual: readonly T[]) {
 	assertSubsetOf(expected, actual);
 	assertSubsetOf(actual, expected);
 }
 
-function assertSubsetOf(subset: readonly any[], set: readonly any[]) {
+function assertSubsetOf<T>(subset: readonly T[], set: readonly T[]) {
 	subset.forEach((subsetItem) => {
 		if (!set.find(setItem => isEqual(setItem, subsetItem))) {
 			fail(`Did not find ${JSON.stringify(subsetItem)} in ${JSON.stringify(set)}`);
@@ -62,8 +62,7 @@ describe('serialization and deserialization', () => {
 	test.each([
 		path.join(__dirname, 'small-gamedata.lua'),
 		'./src/resources/gamedata.lua'
-	])
-	('small game data', async (filepath) => {
+	])('small game data', async (filepath) => {
 		let x = await gameDataParser.parseDSPLuaGameData(filepath);
 		let y = gameDataFromJson(gameDataToJson(x));
 

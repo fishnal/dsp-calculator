@@ -1,4 +1,3 @@
-import { fail } from "assert";
 import { isItemType, isProductionType, Item, FacilityProductionItem, ProductionItem, isFacilityProductionItem } from '../../src/schema/game-ts-schema';
 
 describe('isItemType', () => {
