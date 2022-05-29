@@ -9,8 +9,9 @@ describe('isItemType', () => {
 		Symbol(),
 		null,
 		undefined,
-		BigInt(0)
-	])('false for non-strings: %p', x => {
+		BigInt(0),
+		'fake fake fake'
+	])('false for %p', x => {
 		expect(isItemType(x)).toBeFalsy();
 	});
 
@@ -35,7 +36,8 @@ describe('isProductionType', () => {
 		Symbol(),
 		null,
 		undefined,
-		BigInt(0)
+		BigInt(0),
+		'fake fake fake'
 	])('false for %p', x => {
 		expect(isProductionType(x)).toBeFalsy();
 	});
