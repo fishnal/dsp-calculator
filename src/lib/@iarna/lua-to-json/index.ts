@@ -126,7 +126,7 @@ function parseTable(ast: luaParser.TableConstructorExpression, filepath: string)
 		} else {
 			tableIsArrayLike = false;
 			let keyName = parseExpression(field.key, filepath);
-			if (typeof keyName !== 'number' || typeof keyName !== 'string') {
+			if (typeof keyName !== 'number' && typeof keyName !== 'string') {
 				let msg = `Invalid key type "${typeof keyName}"`;
 				msg += ` at ${getFilepathWithCursorPos(filepath, ast)}`;
 				throw new SyntaxError(msg);

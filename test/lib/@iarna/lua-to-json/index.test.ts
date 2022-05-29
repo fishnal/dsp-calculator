@@ -14,6 +14,7 @@ test('parses simple values', () => {
 	expect(x.my_negative_int).toBe(-1);
 	expect(x.my_negative_zero).toBe(-0);
 	expect(x.my_str).toBe('hello');
+	expect(x.my_size).toBe('hello'.length);
 	expect(x.my_bool).toBe(true);
 	expect(x.my_dict).toEqual({ alice: 1 });
 	expect(x.my_arr).toEqual([ 'alice', 'bob' ]);
@@ -21,7 +22,7 @@ test('parses simple values', () => {
 });
 
 test('parses nested table', () => {
-	let luaStr = readFileSync(path.join(__dirname, 'nested_table.lua')).toString();
+	let luaStr = readFileSync(path.join(__dirname, 'table.lua')).toString();
 
 	let x = luaToJson(luaStr);
 
@@ -44,7 +45,14 @@ test('parses nested table', () => {
 			2: 'CCC',
 			k1: true,
 			k2: false
-		}
+		},
+		e: [
+			'nested',
+			'array',
+			'in a table key'
+		],
+		189402: 'foobar',
+		'user': 'password'
 	});
 });
 
@@ -80,4 +88,13 @@ test('parses array with tables', () => {
 			key2: 'map'
 		}
 	]);
+});
+
+test.each([
+	'x = 2+3',
+	'x = "a"+"b"'
+])
+('fails on binary expressions', luaStr => {
+	expect(() => luaToJson(luaStr))
+		.toThrowError(/unexpected BinaryExpression/i)
 });
