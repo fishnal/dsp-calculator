@@ -1,9 +1,8 @@
 import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/game-ts-schema';
 import path from 'path';
-import gameDataParser from '../../src/game-data/parser';
+import gameDataParser from '../../src/game/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
-import { writeFile } from 'fs/promises';
 
 test('small game data file', async () => {
 	let x = await gameDataParser.parseDSPLuaGameData(path.join(__dirname, 'small-gamedata.lua'));
@@ -69,7 +68,5 @@ describe('serialization and deserialization', () => {
 		let y = gameDataFromJson(gameDataToJson(x));
 
 		expect(y).toEqual(y);
-
-		await writeFile(path.basename(filepath)+'.json', gameDataToJson(x));
 	});
 });
