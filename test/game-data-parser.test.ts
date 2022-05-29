@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import luaToJson from '../src/lib/@iarna/lua-to-json';
-import { parseDSPLuaGameData, mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap, parseLuaGameRecipes } from '../src/recipe-parser';
-import { LuaGameData, LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
+import { mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap, parseLuaGameRecipes } from '../src/game-data-parser';
+import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
 import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../src/schema/game-ts-schema';
 
 jest.mock('fs/promises');
