@@ -15,5 +15,8 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "luaparse": "^0.3.1"
+  },
+  "scripts": {
+    "test": "jest --coverage"
   }
 }

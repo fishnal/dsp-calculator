@@ -3,7 +3,7 @@
 import assert from "assert";
 import luaParser from 'luaparse';
 
-export default function(lua: string) {
+export default function<T = any>(lua: string): T {
 	return luaEval(luaParser.parse(lua));
 }
 
