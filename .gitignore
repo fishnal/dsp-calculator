@@ -5,4 +5,4 @@ coverage/
 !.gitignore
 !.vscode
 !.travis.yml
-!.github/workflows
+!.github/workflows/*
