@@ -5,8 +5,8 @@ import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../../src/s
 import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../../src/schema/game-ts-schema';
 import { fail } from 'assert';
 
-jest.mock('../src/lib/@iarna/lua-to-json');
-jest.mock('../src/schema/game-ts-schema');
+jest.mock('../../src/lib/@iarna/lua-to-json');
+jest.mock('../../src/schema/game-ts-schema');
 
 const mocks = {
 	luaToJson: luaToJson as jest.MockedFn<typeof luaToJson>,

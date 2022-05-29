@@ -1,8 +1,9 @@
-import { Recipe } from '../../src/schema/game-ts-schema';
+import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/game-ts-schema';
 import path from 'path';
 import gameDataParser from '../../src/game-data/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
+import { writeFile } from 'fs/promises';
 
 test('small game data file', async () => {
 	let x = await gameDataParser.parseDSPLuaGameData(path.join(__dirname, 'small-gamedata.lua'));
@@ -57,3 +58,18 @@ function assertSubsetOf(subset: readonly any[], set: readonly any[]) {
 		}
 	});
 }
+
+describe('serialization and deserialization', () => {
+	test.each([
+		path.join(__dirname, 'small-gamedata.lua'),
+		'./src/resources/gamedata.lua'
+	])
+	('small game data', async (filepath) => {
+		let x = await gameDataParser.parseDSPLuaGameData(filepath);
+		let y = gameDataFromJson(gameDataToJson(x));
+
+		expect(y).toEqual(y);
+
+		await writeFile(path.basename(filepath)+'.json', gameDataToJson(x));
+	});
+});
