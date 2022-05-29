@@ -19,7 +19,7 @@ function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities:
 const def = {
 	async parseDSPLuaGameData(filename: string): Promise<GameData> {
 		let buf = await fs.readFile(filename);
-		let luaVariables = luaToJson(buf.toString());
+		let luaVariables = luaToJson(buf.toString()) as { gameData: GameData };
 		if (luaVariables.gameData == null) {
 			throw new Error('did not find variable "gameData"');
 		} else if (typeof luaVariables.gameData !== 'object') {
