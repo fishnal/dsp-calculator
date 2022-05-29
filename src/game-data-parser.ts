@@ -16,14 +16,7 @@ export async function parseDSPLuaGameData(filename: string): Promise<GameData> {
 
 	let { items, itemIdMap } = parseLuaGameItemMap(luaGameItems, luaGameFacilities);
 	let { recipes, recipeIdMap } = parseLuaGameRecipes(luaGameRecipes, itemIdMap);
-	let startingRecipes = luaStartingRecipes.map(id => recipeIdMap.get(id))
-		.filter(function f(x, index): x is Exclude<typeof x, undefined> {
-			if (x == null) {
-				throw new TypeError(`no recipe object for recipe id ${luaStartingRecipes[index]}`);
-			}
-
-			return true;
-		});
+	let startingRecipes = parseStartingRecipes(luaStartingRecipes, recipeIdMap);
 
 	return {
 		items,
@@ -144,6 +137,18 @@ export function mapLuaRecipeItemsToItemsWithFrequency(luaRecipeItems: number[], 
 			count
 		};
 	});
+}
+
+export function parseStartingRecipes(luaStartingRecipes: number[], recipeIdMap: Map<number, Recipe>): Recipe[] {
+	return luaStartingRecipes
+		.map(id => recipeIdMap.get(id))
+		.filter(function f(recipe, index): recipe is Exclude<typeof recipe, undefined> {
+			if (recipe == null) {
+				throw new TypeError(`no recipe object for recipe id ${luaStartingRecipes[index]}`);
+			}
+
+			return true;
+		});
 }
 
 // parseDSPLuaGameData('./src/resources/gamedata.lua').catch(console.error);

@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import luaToJson from '../src/lib/@iarna/lua-to-json';
-import { mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap, parseLuaGameRecipes } from '../src/game-data-parser';
+import { mapLuaRecipeItemsToItemsWithFrequency, parseLuaGameItemMap, parseLuaGameRecipes, parseStartingRecipes } from '../src/game-data-parser';
 import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
 import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../src/schema/game-ts-schema';
 
@@ -241,6 +241,36 @@ describe('parseLuaGameRecipes', () => {
 	});
 });
 
-describe('parse lua game data', () => {
-	test.todo('not written');
+describe('parseStartingRecipes', () => {
+	test('empty list returns empty list', () => {
+		expect(parseStartingRecipes([], new Map())).toHaveLength(0);
+	});
+
+	test('fail when starting recipe id does not have an associated recipe object', () => {
+		expect(() => parseStartingRecipes([0], new Map()))
+			.toThrowError(/no recipe object for recipe id 0/);
+	});
+
+	test('success path', () => {
+		let startingRecipeIds = [ 0, 1, 2 ];
+		let recipeIdMap: Map<number, Recipe> = new Map();
+		startingRecipeIds.forEach(id => recipeIdMap.set(id, { id } as any));
+
+		let startingRecipes = parseStartingRecipes(startingRecipeIds, recipeIdMap);
+		expect(startingRecipes).toHaveLength(3);
+		expect(startingRecipes).toEqual([
+			{ id: 0 },
+			{ id: 1 },
+			{ id: 2 }
+		]);
+	});
+});
+
+describe('parseDSPLuaGameData', () => {
+	/* test('empty game data', () => {
+		mocks.readFile.mockResolvedValue(Buffer.from([]));
+		mocks.luaToJson.mockReturnValue({
+			gameData: {}
+		});
+	}); */
 });
