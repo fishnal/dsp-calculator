@@ -16,8 +16,6 @@ function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities:
 	return productionType;
 }
 
-// parseDSPLuaGameData('./src/resources/gamedata.lua').catch(console.error);
-
 const def = {
 	async parseDSPLuaGameData(filename: string): Promise<GameData> {
 		let buf = await fs.readFile(filename);

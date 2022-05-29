@@ -1,15 +1,14 @@
-import { readFile } from 'fs/promises';
+import fs from 'fs';
 import { luaToJson } from '../src/lib/@iarna/lua-to-json';
 import gameDataParser from '../src/game-data-parser';
 import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../src/schema/game-lua-schema';
 import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../src/schema/game-ts-schema';
+import { fail } from 'assert';
 
-jest.mock('fs/promises');
 jest.mock('../src/lib/@iarna/lua-to-json');
 jest.mock('../src/schema/game-ts-schema');
 
 const mocks = {
-	readFile: readFile as jest.MockedFn<typeof readFile>,
 	luaToJson: luaToJson as jest.MockedFn<typeof luaToJson>,
 	isItemType: isItemType as unknown as jest.MockedFn<typeof isItemType>,
 	isProductionType: isProductionType as unknown as jest.MockedFn<typeof isProductionType>,
@@ -21,6 +20,11 @@ const spies = {
 		parseLuaGameItemMap: jest.spyOn(gameDataParser, 'parseLuaGameItemMap'),
 		parseLuaGameRecipes: jest.spyOn(gameDataParser, 'parseLuaGameRecipes'),
 		parseStartingRecipes: jest.spyOn(gameDataParser, 'parseStartingRecipes')
+	},
+	fs: {
+		promises: {
+			readFile: jest.spyOn(fs.promises, 'readFile')
+		}
 	}
 }
 
@@ -276,7 +280,7 @@ describe('parseStartingRecipes', () => {
 
 describe('parseDSPLuaGameData', () => {
 	test('success path', async () => {
-		mocks.readFile.mockResolvedValue(Buffer.from([]));
+		spies.fs.promises.readFile.mockResolvedValue(Buffer.from([]));
 		mocks.luaToJson.mockReturnValue({ gameData: {} });
 
 		spies.gameDataParser.parseLuaGameItemMap.mockReturnValue({
