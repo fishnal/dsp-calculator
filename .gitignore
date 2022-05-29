@@ -4,3 +4,4 @@ coverage/
 .*
 !.gitignore
 !.vscode
+!.travis.yml
