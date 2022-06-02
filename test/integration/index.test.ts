@@ -1,11 +1,10 @@
 import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/game-ts-schema';
-import path from 'path';
 import gameDataParser from '../../src/game/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
 
 test('small game data file', async () => {
-	let x = await gameDataParser.parseDSPLuaGameData(path.join(__dirname, 'small-gamedata.lua'));
+	let x = await gameDataParser.parseDSPLuaGameData('./test/resources/small-gamedata.lua');
 	const items = [
 		{ name: 'Copper Ore', type: 'RESOURCE' },
 		{ name: 'Iron Ore', type: 'RESOURCE' },
@@ -58,14 +57,12 @@ function assertSubsetOf<T>(subset: readonly T[], set: readonly T[]) {
 	});
 }
 
-describe('serialization and deserialization', () => {
-	test.each([
-		path.join(__dirname, 'small-gamedata.lua'),
-		'./src/resources/gamedata.lua'
-	])('small game data', async (filepath) => {
-		let x = await gameDataParser.parseDSPLuaGameData(filepath);
-		let y = gameDataFromJson(gameDataToJson(x));
+test.each([
+	'./test/resources/small-gamedata.lua',
+	'./src/resources/gamedata.lua'
+])('serialization and deserialization of %p', async (filepath) => {
+	let x = await gameDataParser.parseDSPLuaGameData(filepath);
+	let y = gameDataFromJson(gameDataToJson(x));
 
-		expect(y).toEqual(y);
-	});
+	expect(y).toEqual(x);
 });
