@@ -2,6 +2,11 @@
 	"compilerOptions": {
 		"target": "ES2015",
 		"module": "commonjs",
+		"rootDirs": [
+			"./src",
+			"./test",
+			"./scripts"
+		],
 		"outDir": "dist/",
 		"declaration": true,
 		"sourceMap": true,
