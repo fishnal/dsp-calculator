@@ -14,8 +14,8 @@ export default class RecipeList {
 
 	getByOutputItem(item: Item): Recipe[] {
 		return this._recipes.filter(r =>
-			r.outputs.find(outputItem =>
-				isEqual(outputItem, item)));
+			r.outputs.some(output =>
+				isEqual(output.item, item)));
 	}
 
 	getInputRequirements(outputItem: Item, amountPerMinute: number): ItemWithRate[] {
