@@ -29,5 +29,7 @@ jobs:
     - run: yarn test
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
+      with:
+        tokenL: ${{ secrets.CODECOV_TOKEN }}
     - run: yarn check-coverage
     - run: yarn lint
