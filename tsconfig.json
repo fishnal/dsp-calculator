@@ -2,11 +2,7 @@
 	"compilerOptions": {
 		"target": "ES2015",
 		"module": "commonjs",
-		"rootDirs": [
-			"./src",
-			"./test",
-			"./scripts"
-		],
+		"rootDir": "src/",
 		"listFiles": true,
 		"listEmittedFiles": true,
 		"outDir": "dist/",
