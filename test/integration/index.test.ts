@@ -1,7 +1,8 @@
-import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/GameTsSchema';
 import gameDataParser from '../../src/game/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
+import { Recipe } from '../../src/schema/GameTsSchema';
+import { gameDataFromJson, gameDataToJson } from '../../src/schema/serializer';
 
 test('small game data file', async () => {
 	let x = await gameDataParser.parseDSPLuaGameData('./test/resources/small-gamedata.lua');

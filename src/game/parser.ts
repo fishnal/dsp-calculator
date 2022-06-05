@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import { GameData, Item, isItemType, isProductionType, ProductionType, Recipe, ItemWithFrequency, isFacilityProductionItem } from '../schema/GameTsSchema';
 import chunk from "lodash/chunk";
 import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameFacility, LuaGameRecipe, LuaGameData } from '../schema/GameLuaSchema';
+import MutRecipeArray from '../schema/MutRecipeArray';
 
 function getProductionTypeFromLuaGameFacilityMap(itemId: number, gameFacilities: Record<string, LuaGameFacility>): ProductionType {
 	let result = Object.entries(gameFacilities).find(([ _, gameFacility]) =>
@@ -41,9 +42,9 @@ const def = {
 
 		return {
 			items,
-			recipes,
-			startingRecipes
-		};
+			recipes: new MutRecipeArray(...recipes),
+			startingRecipes: new MutRecipeArray(...startingRecipes)
+		}
 	},
 	parseLuaGameItemMap(gameItemMap: LuaGameItemMap, gameFacilities: LuaGameFacilitiesMap): {
 		items: Item[];
