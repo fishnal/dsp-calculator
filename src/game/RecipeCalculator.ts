@@ -1,25 +1,11 @@
 import { isEqual } from 'lodash';
-import { Recipe, Item, ItemWithRate } from '../schema/GameTsSchema';
+import { ItemWithRate, ReadonlyRecipeArray } from '../schema/GameTsSchema';
 
 export default class RecipeCalculator {
-	private readonly _recipes: Recipe[] = [];
+	constructor(public readonly recipes: ReadonlyRecipeArray) {}
 
-	constructor(recipes: Recipe[]) {
-		this._recipes.push(...recipes);
-	}
-
-	add(recipe: Recipe): void {
-		this._recipes.push(recipe);
-	}
-
-	getByOutputItem(item: Item): Recipe[] {
-		return this._recipes.filter(r =>
-			r.outputs.some(output =>
-				isEqual(output.item, item)));
-	}
-
-	getInputRequirements(outputItem: Item, amountPerMinute: number): ItemWithRate[] {
-		let recipes = this.getByOutputItem(outputItem);
+	getInputRequirements(itemName: string, amountPerMinute: number): ItemWithRate[] {
+		let recipes = this.recipes.byOutput(itemName);
 		if (recipes.length === 0) {
 			return [];
 		}
@@ -27,17 +13,17 @@ export default class RecipeCalculator {
 		// TODO Only picking first recipe for now, but should be selectable
 		let mainRecipe = recipes[0];
 
-		let outputCount = mainRecipe.outputs.find(x => isEqual(x, outputItem))?.count;
+		let outputCount = mainRecipe.outputs.find(x => isEqual(x, itemName))?.count;
 		if (outputCount == null) return [];
 
 		let stdOutputRPM = outputCount / mainRecipe.productionTimeInSeconds * 60;
 		let stackMultiplier = amountPerMinute / stdOutputRPM;
 
-		return this.getInputRequirementsWithMultiplier(outputItem, stackMultiplier);
+		return this.getInputRequirementsWithMultiplier(itemName, stackMultiplier);
 	}
 
-	private getInputRequirementsWithMultiplier(outputItem: Item, stackMultiplier: number): ItemWithRate[] {
-		let recipes = this.getByOutputItem(outputItem);
+	private getInputRequirementsWithMultiplier(itemName: string, stackMultiplier: number): ItemWithRate[] {
+		let recipes = this.recipes.byOutput(itemName);
 		if (recipes.length === 0) {
 			return [];
 		}
@@ -66,9 +52,5 @@ export default class RecipeCalculator {
 		});
 
 		return directInputRequirements.concat(deepInputRequirements);
-	}
-
-	recipes(): readonly Recipe[] {
-		return this._recipes;
 	}
 }
