@@ -1,56 +1,44 @@
-import { isEqual } from 'lodash';
-import { ItemWithRate, ReadonlyRecipeArray } from '../schema/GameTsSchema';
+import { ReadonlyRecipeArray } from '../schema/GameTsSchema';
 
 export default class RecipeCalculator {
 	constructor(public readonly recipes: ReadonlyRecipeArray) {}
 
-	getInputRequirements(itemName: string, amountPerMinute: number): ItemWithRate[] {
-		let recipes = this.recipes.byOutput(itemName);
-		if (recipes.length === 0) {
-			return [];
+	async getInputRequirements(outputItemName: string, targetAmountPerMinute: number): Promise<RecipeRequirement> {
+		let matchedRecipes = this.recipes.byOutput(outputItemName);
+		if (matchedRecipes.length === 0) {
+			throw new Error(`no recipe for ${outputItemName}`);
 		}
 
-		// TODO Only picking first recipe for now, but should be selectable
-		let mainRecipe = recipes[0];
-
-		let outputCount = mainRecipe.outputs.find(x => isEqual(x, itemName))?.count;
-		if (outputCount == null) return [];
-
-		let stdOutputRPM = outputCount / mainRecipe.productionTimeInSeconds * 60;
-		let stackMultiplier = amountPerMinute / stdOutputRPM;
-
-		return this.getInputRequirementsWithMultiplier(itemName, stackMultiplier);
-	}
-
-	private getInputRequirementsWithMultiplier(itemName: string, stackMultiplier: number): ItemWithRate[] {
-		let recipes = this.recipes.byOutput(itemName);
-		if (recipes.length === 0) {
-			return [];
+		// TODO Need a way to select a single recipe when there are multiple
+		// recipes for an item. For now, selecting the first one.
+		if (matchedRecipes.length > 1) {
+			console.info(`Multiple recipes found for ${outputItemName}`);
 		}
 
-		// TODO Only picking first recipe for now, but should be selectable
-		let mainRecipe = recipes[0];
+		let recipe = matchedRecipes[0];
+		let outputCount = recipe.outputs
+			.find(recipeOutput => recipeOutput.item.name === outputItemName)
+			?.count;
+		if (outputCount == null) {
+			throw new Error(`Did not find item ${outputItemName} in the outputs for recipe ${JSON.stringify(recipe)}`);
+		}
 
-		let directInputRequirements: ItemWithRate[] = mainRecipe.inputs.reduce((acc, input) => {
-			let inputCount = mainRecipe.inputs.find(x => isEqual(x, input))?.count;
-			if (inputCount != null) {
-				// this is the input rate necessary in order to satisfy "normal" output rate
-				let stdInputRatePerMin = inputCount / mainRecipe.productionTimeInSeconds * 60;
-				let targetInputRPM = stdInputRatePerMin * stackMultiplier;
+		let standardOutputPerMinute = outputCount / recipe.productionTimeInSeconds * 60;
+		let amountPerMinuteScale = targetAmountPerMinute / standardOutputPerMinute;
 
-				acc.push({
-					item: input.item,
-					perMinute: targetInputRPM
-				});
-			}
-
-			return acc;
-		}, [] as ItemWithRate[]);
-
-		let deepInputRequirements = mainRecipe.inputs.flatMap(input => {
-			return this.getInputRequirementsWithMultiplier(input.item, stackMultiplier);
-		});
-
-		return directInputRequirements.concat(deepInputRequirements);
+		return {
+			itemName: outputItemName,
+			amountPerMinute: targetAmountPerMinute,
+			requires: await Promise.all(recipe.inputs.map(async (recipeInput) => {
+				throw new Error('not implemented yet');
+				// this.getInputRequirements(recipeInput.item.name, )
+			}))
+		}
 	}
+}
+
+type RecipeRequirement = {
+	itemName: string;
+	amountPerMinute: number;
+	requires: RecipeRequirement[];
 }

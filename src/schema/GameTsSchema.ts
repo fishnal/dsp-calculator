@@ -46,11 +46,6 @@ export type ItemWithFrequency = {
 	readonly count: number;
 }
 
-export type ItemWithRate = {
-	readonly item: Item;
-	readonly perMinute: number;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isItemType(x: any): x is ItemType {
 	if (x == null || typeof x !== 'string') return false;
