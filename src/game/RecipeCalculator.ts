@@ -29,7 +29,7 @@ export default class RecipeCalculator {
 		return {
 			itemName: outputItemName,
 			amountPerMinute: targetAmountPerMinute,
-			requires: await Promise.all(recipe.inputs.map(async (recipeInput) => {
+			requires: await Promise.all(recipe.inputs.map(async (_recipeInput) => {
 				throw new Error('not implemented yet');
 				// this.getInputRequirements(recipeInput.item.name, )
 			}))

@@ -33,3 +33,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
     - run: yarn check-coverage
     - run: yarn lint
+    - run: yarn compile
