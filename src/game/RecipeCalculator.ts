@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
 import { Recipe, Item, ItemWithRate } from '../schema/GameTsSchema';
 
-export default class RecipeList {
+export default class RecipeCalculator {
 	private readonly _recipes: Recipe[] = [];
 
 	constructor(recipes: Recipe[]) {

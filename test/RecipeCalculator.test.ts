@@ -1,30 +1,30 @@
 import { randomBytes } from "crypto";
-import RecipeList from "../src/game/RecipeList";
+import RecipeCalculator from "../src/game/RecipeCalculator";
 import { Recipe, Item, ItemType } from './schema/GameTsSchema';
 
 describe('getting list of recipes', () => {
 	test('is not a reference to the same array passed in constructor', () => {
 		let arr: Recipe[] = [];
-		let x = new RecipeList(arr);
+		let x = new RecipeCalculator(arr);
 		expect(x).not.toBe(arr);
 
 	});
 
 	test('is empty when initialized with empty array', () => {
-		let x = new RecipeList([]);
+		let x = new RecipeCalculator([]);
 		expect(x.recipes()).toHaveLength(0);
 	});
 
 	test('is correct when initialized with some recipes', () => {
 		let recipes = [ null, null, null ] as unknown[] as Recipe[];
-		let x = new RecipeList(recipes);
+		let x = new RecipeCalculator(recipes);
 		expect(x.recipes()).toEqual([null, null, null]);
 	});
 });
 
 describe('getByOutputItem', () => {
 	test('gives empty list when there are no recipes', () => {
-		let recipeList = new RecipeList([]);
+		let recipeList = new RecipeCalculator([]);
 		let item: Item = { name: '', type: 'RESOURCE' };
 
 		expect(recipeList.getByOutputItem(item)).toHaveLength(0);
@@ -39,7 +39,7 @@ describe('getByOutputItem', () => {
 			"producedIn": { name: 'smelter', productionType: 'SMELT', productionSpeed: -1, type: 'PRODUCTION' },
 			"productionTimeInSeconds": 1
 		} as Recipe;
-		let recipeList = new RecipeList([recipe]);
+		let recipeList = new RecipeCalculator([recipe]);
 
 		expect(recipeList.getByOutputItem({ name: 'n/a', type: 'MATRIX' }))
 			.toHaveLength(0);
@@ -54,7 +54,7 @@ describe('getByOutputItem', () => {
 			"producedIn": { name: 'smelter', productionType: 'SMELT', productionSpeed: -1, type: 'PRODUCTION' },
 			"productionTimeInSeconds": 1
 		} as Recipe;
-		let recipeList = new RecipeList([ironIngotRecipe, randomRecipe()]);
+		let recipeList = new RecipeCalculator([ironIngotRecipe, randomRecipe()]);
 
 		expect(recipeList.getByOutputItem(ironIngot)).toEqual([ironIngotRecipe]);
 	});
@@ -75,7 +75,7 @@ describe('getByOutputItem', () => {
 			"producedIn": { name: 'smelter', productionType: 'SMELT', productionSpeed: -1, type: 'PRODUCTION' },
 			"productionTimeInSeconds": 1
 		} as Recipe;
-		let recipeList = new RecipeList([ironIngotRecipe, ironIngotRecipe2, randomRecipe(), randomRecipe()]);
+		let recipeList = new RecipeCalculator([ironIngotRecipe, ironIngotRecipe2, randomRecipe(), randomRecipe()]);
 
 		expect(recipeList.getByOutputItem(ironIngot)).toEqual([ironIngotRecipe, ironIngotRecipe2]);
 	});
