@@ -1,4 +1,4 @@
-import MutRecipeArray from './MutRecipeArray';
+import RecipeArray from './RecipeArray';
 import { Item, GameData, Recipe, ItemWithFrequency } from './GameTsSchema';
 
 export function gameDataToJson(gameData: GameData): string {
@@ -99,8 +99,8 @@ export function gameDataFromJson(jsonStr: string): GameData {
 
 	return {
 		items: serializedGameData.items,
-		recipes: new MutRecipeArray(...recipes),
-		startingRecipes: new MutRecipeArray(...startingRecipes)
+		recipes: RecipeArray(recipes),
+		startingRecipes: RecipeArray(startingRecipes)
 	}
 }
 
