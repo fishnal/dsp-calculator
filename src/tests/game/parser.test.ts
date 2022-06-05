@@ -1,12 +1,12 @@
 import fs from 'fs';
 
-import { luaToJson } from '@/lib/@iarna/lua-to-json';
-import gameDataParser from '@/game/parser';
-import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '@/schema/GameLuaSchema';
-import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '@/schema/GameTsSchema';
+import { luaToJson } from '@/main/lib/@iarna/lua-to-json';
+import gameDataParser from '@/main/game/parser';
+import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '@/main/schema/GameLuaSchema';
+import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '@/main/schema/GameTsSchema';
 
-jest.mock('../../src/lib/@iarna/lua-to-json');
-jest.mock('../../src/schema/GameTsSchema');
+jest.mock('@/main/lib/@iarna/lua-to-json');
+jest.mock('@/main/schema/GameTsSchema');
 
 const mocks = {
 	luaToJson: luaToJson as jest.MockedFn<typeof luaToJson>,

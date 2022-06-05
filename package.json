@@ -28,8 +28,8 @@
   },
   "scripts": {
     "test": "jest --coverage",
-    "check-coverage": "ts-node scripts/check-coverage.ts",
-    "lint": "eslint --debug src/**/*.ts test/**/*.ts",
-    "compile": "rimraf dist/ && tsc"
+    "check-coverage": "ts-node src/cli/check-coverage.ts",
+    "lint": "eslint --debug src/**/*.ts",
+    "compile": "rimraf dist/ && tsc -p tsconfig.compile.json"
   }
 }

@@ -1,4 +1,4 @@
-import { extendObjectTo, getAllEntries } from "@/utils/objects";
+import { extendObjectTo, getAllEntries } from "@/main/utils/objects";
 
 describe('getAllEntries', () => {
 	test('empty object', () => {

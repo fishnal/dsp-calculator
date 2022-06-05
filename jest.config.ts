@@ -23,7 +23,7 @@ export default {
 	// collectCoverageFrom: undefined,
 
 	// The directory where Jest should output its coverage files
-	coverageDirectory: "coverage",
+	coverageDirectory: "./coverage",
 
 	// An array of regexp pattern strings used to skip coverage collection
 	// coveragePathIgnorePatterns: [
@@ -79,7 +79,11 @@ export default {
 	// ],
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-	// moduleNameMapper: {},
+	moduleNameMapper: {
+		'^@/main/(.*)$': '<rootDir>/src/main/$1',
+		'^@/tests/(.*)$': '<rootDir>/src/tests/$1',
+		'^@/cli/(.*)$': '<rootDir>/src/cli/$1',
+	},
 
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],
@@ -112,7 +116,7 @@ export default {
 	// restoreMocks: false,
 
 	// The root directory that Jest should scan for tests and modules within
-	// rootDir: undefined,
+	// rootDir: ".",
 
 	// A list of paths to directories that Jest should use to search for files in
 	// roots: [
@@ -144,9 +148,9 @@ export default {
 	// testLocationInResults: false,
 
 	// The glob patterns Jest uses to detect test files
-	testMatch: [
-		"**/test/**/*.[jt]s?(x)",
-	],
+	// testMatch: [
+	// 	"src/tests/**/*.test.ts?x",
+	// ],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
 	testPathIgnorePatterns: [
@@ -155,7 +159,9 @@ export default {
 	],
 
 	// The regexp pattern or array of patterns that Jest uses to detect test files
-	// testRegex: [],
+	testRegex: [
+		"src/tests/.*\\.test\\.tsx?"
+	],
 
 	// This option allows the use of a custom results processor
 	// testResultsProcessor: undefined,

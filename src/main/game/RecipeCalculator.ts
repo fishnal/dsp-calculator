@@ -1,4 +1,4 @@
-import { ReadonlyRecipeArray } from '@/schema/GameTsSchema';
+import { ReadonlyRecipeArray } from '@/main/schema/GameTsSchema';
 
 export default class RecipeCalculator {
 	constructor(public readonly recipes: ReadonlyRecipeArray) {}

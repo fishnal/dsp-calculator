@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 
-import { Item, ItemType, Recipe } from "@/schema/GameTsSchema";
+import { Item, ItemType, Recipe } from "@/main/schema/GameTsSchema";
 
 test('foo', () => {
 	expect(1).toBe(1);

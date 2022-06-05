@@ -1,12 +1,12 @@
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
 
-import gameDataParser from '@/game/parser';
-import { Recipe } from '@/schema/GameTsSchema';
-import { gameDataFromJson, gameDataToJson } from '@/schema/serializer';
+import gameDataParser from '@/main/game/parser';
+import { Recipe } from '@/main/schema/GameTsSchema';
+import { gameDataFromJson, gameDataToJson } from '@/main/schema/serializer';
 
 test('small game data file', async () => {
-	let x = await gameDataParser.parseDSPLuaGameData('./test/resources/small-gamedata.lua');
+	let x = await gameDataParser.parseDSPLuaGameData('./src/tests/resources/small-gamedata.lua');
 	const items = [
 		{ name: 'Copper Ore', type: 'RESOURCE' },
 		{ name: 'Iron Ore', type: 'RESOURCE' },
@@ -60,8 +60,8 @@ function assertSubsetOf<T>(subset: readonly T[], set: readonly T[]) {
 }
 
 test.each([
-	'./test/resources/small-gamedata.lua',
-	'./src/resources/gamedata.lua'
+	'./src/tests/resources/small-gamedata.lua',
+	'./src/main/resources/gamedata.lua'
 ])('serialization and deserialization of %p', async (filepath) => {
 	let x = await gameDataParser.parseDSPLuaGameData(filepath);
 	let y = gameDataFromJson(gameDataToJson(x));

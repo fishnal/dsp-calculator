@@ -1,8 +1,6 @@
 {
 	"include": [
-		"src/**/*",
-		"test/**/*",
-		"scripts/**/*"
+		"src/**/*"
 	],
 	"exclude": [
 		"dist/",
@@ -14,13 +12,16 @@
 		"module": "commonjs",
 		"baseUrl": "./",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/main/*": ["./src/main/*"],
+			"@/tests/*": ["./src/tests/*"],
+			"@/cli/*": ["./src/cli/*"]
 		},
-		"outDir": "dist/",
 		"listFiles": true,
 		"listEmittedFiles": true,
 		"declaration": true,
 		"sourceMap": true,
+		"outDir": "dist/lib",
+		"declarationDir": "dist/@types",
 		"removeComments": true,
 		"strict": true,
 		"noImplicitAny": true,
