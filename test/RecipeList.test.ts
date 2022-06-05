@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import RecipeList from "../src/game/RecipeList";
-import { Recipe, Item, ItemType } from '../src/schema/game-ts-schema';
+import { Recipe, Item, ItemType } from './schema/GameTsSchema';
 
 describe('getting list of recipes', () => {
 	test('is not a reference to the same array passed in constructor', () => {

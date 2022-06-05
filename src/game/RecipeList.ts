@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { Recipe, Item, ItemWithRate } from '../schema/game-ts-schema';
+import { Recipe, Item, ItemWithRate } from '../schema/GameTsSchema';
 
 export default class RecipeList {
 	private readonly _recipes: Recipe[] = [];

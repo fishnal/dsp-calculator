@@ -1,4 +1,4 @@
-import { isItemType, isProductionType, Item, FacilityProductionItem, ProductionItem, isFacilityProductionItem } from '../../src/schema/game-ts-schema';
+import { isItemType, isProductionType, Item, FacilityProductionItem, ProductionItem, isFacilityProductionItem } from '../../src/schema/GameTsSchema';
 
 describe('isItemType', () => {
 	test.each([

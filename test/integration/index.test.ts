@@ -1,4 +1,4 @@
-import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/game-ts-schema';
+import { Recipe, gameDataToJson, gameDataFromJson } from '../../src/schema/GameTsSchema';
 import gameDataParser from '../../src/game/parser';
 import { fail } from 'assert';
 import { isEqual } from 'lodash';
