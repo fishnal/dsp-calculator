@@ -1,5 +1,6 @@
 import converter from 'xml2js';
 import { readFile } from 'fs/promises';
+import path from 'path';
 
 const THRESHOLDS = {
 	branches: 90,
@@ -9,6 +10,8 @@ const THRESHOLDS = {
 };
 
 (async () => {
+	console.log('__dirname: ', __dirname);
+	console.log('file: ', path.resolve('./coverage/clover.xml'));
 	let coverageContents = await readFile('./coverage/clover.xml');
 	let x = await converter.parseStringPromise(coverageContents, {});
 
