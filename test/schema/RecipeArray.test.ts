@@ -1,5 +1,5 @@
-import RecipeArray from '../../src/schema/RecipeArray';
-import { Recipe, FacilityProductionItem } from '../../src/schema/GameTsSchema';
+import RecipeArray from '@/schema/RecipeArray';
+import { Recipe, FacilityProductionItem } from '@/schema/GameTsSchema';
 
 describe('factory fuction', () => {
 	test('with no args', () => {

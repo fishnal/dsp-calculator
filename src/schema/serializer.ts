@@ -1,5 +1,5 @@
-import RecipeArray from './RecipeArray';
-import { Item, GameData, Recipe, ItemWithFrequency } from './GameTsSchema';
+import RecipeArray from '@/schema/RecipeArray';
+import { Item, GameData, Recipe, ItemWithFrequency } from '@/schema/GameTsSchema';
 
 export function gameDataToJson(gameData: GameData): string {
 	function serializeRecipe(recipe: Recipe): SerializedRecipe {

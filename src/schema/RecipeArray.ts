@@ -1,5 +1,5 @@
-import { Recipe } from './GameTsSchema';
-import { extendObjectTo } from '../utils/objects';
+import { Recipe } from '@/schema/GameTsSchema';
+import { extendObjectTo } from '@/utils/objects';
 
 interface IRecipeArray extends Array<Recipe> {
 	byOutput(itemName: string): IRecipeArray;

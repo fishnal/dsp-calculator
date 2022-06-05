@@ -1,8 +1,9 @@
 import fs from 'fs';
-import { luaToJson } from '../../src/lib/@iarna/lua-to-json';
-import gameDataParser from '../../src/game/parser';
-import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '../../src/schema/GameLuaSchema';
-import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '../../src/schema/GameTsSchema';
+
+import { luaToJson } from '@/lib/@iarna/lua-to-json';
+import gameDataParser from '@/game/parser';
+import { LuaGameItemMap, LuaGameFacilitiesMap, LuaGameRecipe } from '@/schema/GameLuaSchema';
+import { isItemType, isProductionType, isFacilityProductionItem, Item, FacilityProductionItem, ProductionItem, Recipe } from '@/schema/GameTsSchema';
 
 jest.mock('../../src/lib/@iarna/lua-to-json');
 jest.mock('../../src/schema/GameTsSchema');

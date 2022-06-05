@@ -1,6 +1,8 @@
 {
 	"include": [
-		"src/"
+		"src/**/*",
+		"test/**/*",
+		"scripts/**/*"
 	],
 	"exclude": [
 		"dist/",
@@ -10,10 +12,13 @@
 	"compilerOptions": {
 		"target": "ES2015",
 		"module": "commonjs",
-		"rootDir": ".",
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"outDir": "dist/",
 		"listFiles": true,
 		"listEmittedFiles": true,
-		"outDir": "dist/",
 		"declaration": true,
 		"sourceMap": true,
 		"removeComments": true,

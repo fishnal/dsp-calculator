@@ -1,7 +1,6 @@
 import { randomBytes } from "crypto";
-import RecipeCalculator from "../src/game/RecipeCalculator";
-import RecipeArray from '../src/schema/RecipeArray';
-import { Item, ItemType, Recipe } from '../src/schema/GameTsSchema';
+
+import { Item, ItemType, Recipe } from "@/schema/GameTsSchema";
 
 test('foo', () => {
 	expect(1).toBe(1);
