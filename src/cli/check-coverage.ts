@@ -1,6 +1,7 @@
 import converter from 'xml2js';
 import { readFile } from 'fs/promises';
 import path from 'path';
+import { existsSync } from 'fs';
 
 const THRESHOLDS = {
 	branches: 90,
@@ -12,6 +13,8 @@ const THRESHOLDS = {
 (async () => {
 	console.log('__dirname: ', __dirname);
 	console.log('file: ', path.resolve('./coverage/clover.xml'));
+	console.log('./coverage exists: ', existsSync('./coverage'));
+	console.log('./coverage/lcov-report exists: ', existsSync('./coverage/lcov-report'))
 	let coverageContents = await readFile('./coverage/clover.xml');
 	let x = await converter.parseStringPromise(coverageContents, {});
 
