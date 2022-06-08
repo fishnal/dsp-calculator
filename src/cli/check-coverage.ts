@@ -4,9 +4,9 @@ import path from 'path';
 import { existsSync } from 'fs';
 
 const THRESHOLDS = {
-	branches: 90,
-	methods: 90,
-	statements: 90,
+	branches: 95,
+	methods: 95,
+	statements: 95,
 	maxMissedStatements: 10
 };
 
