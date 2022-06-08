@@ -293,7 +293,7 @@ function makeStubRecipes(count: number): Recipe[] {
 
 describe('parseDSPLuaGameData', () => {
 	test('success path', async () => {
-		spies.fs.promises.readFile.mockResolvedValue(Buffer.from([]));
+		spies.fs.promises.readFile.mockResolvedValueOnce(Buffer.from([]));
 		mocks.luaToJson.mockReturnValue({ gameData: {} });
 
 		spies.gameDataParser.parseLuaGameItemMap.mockReturnValue({
@@ -310,5 +310,36 @@ describe('parseDSPLuaGameData', () => {
 		expect(items).toHaveLength(0);
 		expect(recipes).toHaveLength(0);
 		expect(startingRecipes).toHaveLength(0);
+	});
+
+	test('fails when there is no "gameData" variable', async () => {
+		spies.fs.promises.readFile.mockResolvedValueOnce(Buffer.from([]));
+		mocks.luaToJson.mockReturnValue({});
+
+		await expect(gameDataParser.parseDSPLuaGameData(''))
+			.rejects.toThrowError('did not find variable "gameData"');
+	});
+
+	test('fails when there is no "gameData" variable', async () => {
+		spies.fs.promises.readFile.mockResolvedValueOnce(Buffer.from([]));
+		mocks.luaToJson.mockReturnValue({});
+
+		await expect(gameDataParser.parseDSPLuaGameData(''))
+			.rejects.toThrowError('did not find variable "gameData"');
+	});
+
+	test.each([
+		{ type: 'number', value: 1 },
+		{ type: 'bigint', value: BigInt(1) },
+		{ type: 'string', value: 'a' },
+		{ type: 'boolean', value: true },
+		{ type: 'symbol', value: Symbol() },
+		{ type: 'array', value: [] }
+	])('fails when "gameData" is a $type', async ({type, value}) => {
+		spies.fs.promises.readFile.mockResolvedValueOnce(Buffer.from([]));
+		mocks.luaToJson.mockReturnValue({ gameData: value });
+
+		await expect(gameDataParser.parseDSPLuaGameData(''))
+			.rejects.toThrowError(`expected "gameData" to be dictionary, but instead is ${type}`);
 	});
 });
