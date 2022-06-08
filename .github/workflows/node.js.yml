@@ -31,6 +31,8 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true
+        verbose: true
     - run: yarn check-coverage
     - run: yarn lint
     - run: yarn compile
