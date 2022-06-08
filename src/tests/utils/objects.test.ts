@@ -18,7 +18,7 @@ describe('getAllEntries', () => {
 });
 
 describe('extendObjectTo', () => {
-	let obj: Record<string | symbol, unknown>;
+	let obj: { a: 0, [x: symbol]: 1 };
 
 	beforeEach(() => {
 		obj = { a: 0, [Symbol(0)]: 1 };
