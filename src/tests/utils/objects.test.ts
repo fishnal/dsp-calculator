@@ -1,4 +1,4 @@
-import { extendObjectTo, getAllEntries } from "@/main/utils/objects";
+import { extendObjectTo, getAllEntries, lazyGetter } from "@/main/utils/objects";
 
 describe('getAllEntries', () => {
 	test('empty object', () => {
@@ -44,5 +44,27 @@ describe('extendObjectTo', () => {
 	test('added properties are enumerable', () => {
 		let y = extendObjectTo(obj, { foo: 2 }, true);
 		expect(Object.keys(y)).toContain('foo');
+	});
+});
+
+describe('lazyGetter', () => {
+	test('lazily invokes a supplier exactly once and re-uses the result', () => {
+		const sym = Symbol();
+		const spySupplier = jest.fn<symbol, []>();
+		spySupplier.mockReturnValue(sym);
+
+		const o = {
+			getValue: lazyGetter(spySupplier)
+		}
+
+		let x = o.getValue();
+		let y = o.getValue();
+		let z = o.getValue();
+
+		expect(x).toBe(sym);
+		expect(x).toBe(y);
+		expect(y).toBe(z);
+
+		expect(spySupplier).toBeCalledTimes(1);
 	});
 });

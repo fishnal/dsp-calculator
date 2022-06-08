@@ -21,3 +21,15 @@ export function getAllEntries<T>(obj: T): [ keyof T, T[keyof T] ][] {
 	return allEntries
 		.concat(symbolBasedEntries);
 }
+
+export function lazyGetter<T>(supplier: () => T): () => T {
+	let value: T | undefined;
+
+	return () => {
+		if (value == null) {
+			value = supplier();
+		}
+
+		return value;
+	};
+}
