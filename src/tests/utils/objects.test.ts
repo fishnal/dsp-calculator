@@ -41,9 +41,13 @@ describe('extendObjectTo', () => {
 		expect(y[newSym]).toBe(2);
 	});
 
-	test('added properties are enumerable', () => {
+	test('added properties are enumerable, writable, and configurable', () => {
 		let y = extendObjectTo(obj, { foo: 2 }, true);
-		expect(Object.keys(y)).toContain('foo');
+		let desc = Object.getOwnPropertyDescriptor(y, 'foo');
+
+		expect(desc?.configurable).toBeTrue();
+		expect(desc?.enumerable).toBeTrue();
+		expect(desc?.writable).toBeTrue();
 	});
 });
 

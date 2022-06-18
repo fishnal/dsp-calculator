@@ -207,6 +207,23 @@ describe('getRecipeDetails', () => {
 			{ itemName: items.a.name, amountPerMinute: 20, requirements: expect.toBeFunction() }
 		]);
 	});
+
+	test('fails when matched recipe object does not actually contain the output item', () => {
+		let items = {
+			a: { name: 'a', type: 'RESOURCE' },
+			b: { name: 'b', type: 'COMPONENT' },
+		} as const;
+		let recipes = RecipeArray([{
+			inputs: [], outputs: [], producedIn: FAKE_FACILITY, productionTimeInSeconds: -1
+		}]);
+		let spyByOutput = jest.spyOn(recipes, 'byOutput');
+		spyByOutput.mockReturnValueOnce(RecipeArray(recipes.slice(0, 1)));
+
+		let calc = new RecipeCalculator(Object.values(items), recipes, getFirstRecipe);
+
+		expect(() => calc.getRecipeDetails(items.b.name, 3))
+			.toThrowError(/Did not find item b in the outputs for recipe {.*}/i);
+	})
 });
 
 const FAKE_FACILITY: FacilityProductionItem = {

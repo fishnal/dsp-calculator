@@ -1,6 +1,6 @@
 export function extendObjectTo<T, U>(obj: T, newProperties: U, enumerable?: boolean): T & U {
 	getAllEntries(newProperties).forEach(([ key, value ]) => {
-		Object.defineProperty(obj, key, { value: value, enumerable });
+		Object.defineProperty(obj, key, { value: value, enumerable, writable: true, configurable: true });
 	});
 	return obj as unknown as (T & U);
 }
