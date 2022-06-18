@@ -1,8 +1,9 @@
-import RecipeCalculator from "@/main/game/RecipeCalculator";
-import { Item } from "@/main/schema/GameTsSchema";
+import RecipeCalculator, { PreferredRecipeFunction } from "@/main/game/RecipeCalculator";
+import { FacilityProductionItem, Item } from "@/main/schema/GameTsSchema";
 import RecipeArray from "@/main/schema/RecipeArray";
 import { groupBy, ValueIteratee } from "lodash";
-import { FacilityProductionItem } from '../../main/schema/GameTsSchema';
+
+const getFirstRecipe: PreferredRecipeFunction = (_, list) => list[0];
 
 describe('getRecipeDetails', () => {
 	test.each([
@@ -37,7 +38,7 @@ describe('getRecipeDetails', () => {
 				productionTimeInSeconds: 5
 			}
 		]);
-		let calc = new RecipeCalculator(Object.values(items), recipes);
+		let calc = new RecipeCalculator(Object.values(items), recipes, getFirstRecipe);
 
 		let details = calc.getRecipeDetails(items.cooked_beef.name, ironPerMinute);
 
@@ -85,7 +86,7 @@ describe('getRecipeDetails', () => {
 			},
 
 		]);
-		let calc = new RecipeCalculator(Object.values(items), recipes);
+		let calc = new RecipeCalculator(Object.values(items), recipes, getFirstRecipe);
 
 		let beefPastaPerMinute = 18;
 
@@ -160,7 +161,7 @@ describe('getRecipeDetails', () => {
 	});
 
 	test('fails when the item does not exist', () => {
-		let calc = new RecipeCalculator([], RecipeArray());
+		let calc = new RecipeCalculator([], RecipeArray(), getFirstRecipe);
 
 		expect(() => calc.getRecipeDetails('iron', 1))
 			.toThrowError('iron is not a registered item');
@@ -168,10 +169,43 @@ describe('getRecipeDetails', () => {
 
 	test('fails when recipe could not be found', () => {
 		let items: Item[] = [ { name: 'foo', type: 'COMPONENT' } ];
-		let calc = new RecipeCalculator(items, RecipeArray());
+		let calc = new RecipeCalculator(items, RecipeArray(), getFirstRecipe);
 
 		expect(() => calc.getRecipeDetails('foo', 1))
 			.toThrowError('no recipe for foo');
+	});
+
+	test('uses a preferred recipe when there are multiple matching recipes for an output', () => {
+		let items = {
+			a: { name: 'a', type: 'RESOURCE' },
+			b: { name: 'b', type: 'COMPONENT' },
+		} as const;
+		let recipes = RecipeArray([
+			{
+				inputs: [], outputs: [{item: items.b, count: 1}],
+				producedIn: FAKE_FACILITY, productionTimeInSeconds: 1
+			},
+			{
+				inputs: [{item: items.a, count:1}], outputs: [{item: items.b, count: 3}],
+				producedIn: FAKE_FACILITY, productionTimeInSeconds: 1
+			}
+		]);
+
+		let mockPreferredRecipe = jest.fn<
+			ReturnType<PreferredRecipeFunction>,
+			Parameters<PreferredRecipeFunction>
+		>();
+		mockPreferredRecipe.mockReturnValue(recipes[1]);
+
+		let calc = new RecipeCalculator(Object.values(items), recipes, mockPreferredRecipe);
+		let details = calc.getRecipeDetails(items.b.name, 60);
+
+		expect(mockPreferredRecipe.mock.calls.length).toBe(1);
+		expect(details.itemName).toBe(items.b.name);
+		expect(details.amountPerMinute).toBe(60);
+		expect(details.requirements()).toEqual([
+			{ itemName: items.a.name, amountPerMinute: 20, requirements: expect.toBeFunction() }
+		]);
 	});
 });
 

@@ -1,10 +1,13 @@
 import { Item, ItemWithFrequency, ReadonlyRecipeArray, Recipe } from '@/main/schema/GameTsSchema';
 import { lazyGetter } from '@/main/utils/objects';
 
+export type PreferredRecipeFunction = (outputItem: string, listOfRecipes: ReadonlyRecipeArray) => Recipe;
+
 export default class RecipeCalculator {
 	constructor(
 		public readonly items: readonly Item[],
-		public readonly recipes: ReadonlyRecipeArray
+		public readonly recipes: ReadonlyRecipeArray,
+		public readonly getPreferredRecipe: PreferredRecipeFunction
 	) {}
 
 	getRecipeDetails(itemName: string, targetOutputPerMinute: number): RecipeDetails {
@@ -24,13 +27,14 @@ export default class RecipeCalculator {
 			throw new Error(`no recipe for ${itemName}`);
 		}
 
-		// TODO Need a way to select a single recipe when there are multiple
-		// recipes for an item. For now, selecting the first one.
-		if (matchedRecipes.length > 1) {
-			console.info(`Multiple recipes found for ${itemName}`);
+		let recipe: Recipe;
+		if (matchedRecipes.length === 1) {
+			recipe = matchedRecipes[0];
+		} else {
+			recipe = this.getPreferredRecipe(itemName, matchedRecipes);
+			console.info(`Multiple recipes found for ${itemName}, using ${recipe}`);
 		}
 
-		let recipe = matchedRecipes[0];
 		let output = recipe.outputs.find(recipeOutput => recipeOutput.item.name === itemName);
 		if (output == null) {
 			throw new Error(`Did not find item ${itemName} in the outputs for recipe ${JSON.stringify(recipe)}`);
