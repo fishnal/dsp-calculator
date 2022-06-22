@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Coverage Report Server",
+			"type": "shell",
+			"command": "http-server -c-1 ./coverage/lcov-report",
+			"presentation": {
+				"reveal": "silent",
+				"close": true
+			},
+			"group": "build",
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		}
+	]
+}
